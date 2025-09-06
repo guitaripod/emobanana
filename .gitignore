@@ -40,7 +40,6 @@ Thumbs.db
 
 # Rust
 rust-analyzer/
-Cargo.lock
 
 # Images
 *.png
