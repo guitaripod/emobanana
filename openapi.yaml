@@ -17,7 +17,7 @@ externalDocs:
   url: https://github.com/yourusername/emobanana
 
 servers:
-  - url: https://emobanana.yourusername.workers.dev
+  - url: https://emobanana.guitaripod.workers.dev
     description: Production server
 
 tags:

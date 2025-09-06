@@ -81,13 +81,46 @@ Transform the facial expression of a creature in an image to match an emoji.
    npx wrangler deploy
    ```
 
+## CLI Tool
+
+A command-line tool is available for testing the backend API locally.
+
+### Build the CLI
+
+```bash
+cargo build --bin emobanana-cli
+```
+
+### Usage
+
+```bash
+cargo run --bin emobanana-cli -- --image path/to/image.jpg --emoji 😊
+```
+
+### CLI Options
+
+- `-i, --image <IMAGE>`: Path to the input image file
+- `-e, --emoji <EMOJI>`: Emoji to use for transformation
+- `-u, --url <URL>`: Backend API URL (default: https://emobanana.guitaripod.workers.dev)
+- `-o, --output <OUTPUT>`: Output file path for the transformed image (default: transformed.png)
+
+### Example
+
+```bash
+# Transform a cat image to have a happy expression
+cargo run --bin emobanana-cli -- --image cat.jpg --emoji 😺 --output happy_cat.png
+
+# Use a different backend URL
+cargo run --bin emobanana-cli -- --image dog.jpg --emoji 🐕 --url https://emobanana.guitaripod.workers.dev
+```
+
 ## Development
 
 1. Install wrangler CLI
 2. Run locally:
-   ```bash
-   npx wrangler dev
-   ```
+    ```bash
+    npx wrangler dev
+    ```
 
 ## License
 
