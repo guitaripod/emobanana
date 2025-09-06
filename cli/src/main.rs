@@ -4,7 +4,7 @@ mod models;
 mod utils;
 mod error;
 
-use clap::{Parser, CommandFactory};
+use clap::Parser;
 use tracing::info;
 use tracing_subscriber;
 
@@ -20,13 +20,7 @@ async fn main() -> Result<()> {
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
-    let args = match Args::try_parse() {
-        Ok(args) => args,
-        Err(_) => {
-            Args::command().print_help()?;
-            std::process::exit(0);
-        }
-    };
+    let args = Args::parse();
 
     info!("Starting image transformation");
     info!("Image: {}", args.image);
