@@ -67,7 +67,7 @@ pub async fn handle_transform(mut req: Request, ctx: RouteContext<()>) -> Result
             } else {
                 "unknown".to_string()
             };
-            let key = format!("rate_limit_v2:{}:{}", client_ip, today);
+            let key = format!("rate_limit:{}:{}", client_ip, today);
 
             let current_count: u32 = match kv.get(&key).text().await {
                 Ok(Some(count_str)) => count_str.parse().unwrap_or(0),
@@ -120,7 +120,7 @@ async fn check_rate_limit(req: &Request, env: &worker::Env) -> worker::Result<()
     } else {
         "unknown".to_string()
     };
-    let key = format!("rate_limit_v2:{}:{}", client_ip, today);
+    let key = format!("rate_limit:{}:{}", client_ip, today);
 
     let current_count: u32 = match kv.get(&key).text().await {
         Ok(Some(count_str)) => count_str.parse().unwrap_or(0),
@@ -128,7 +128,7 @@ async fn check_rate_limit(req: &Request, env: &worker::Env) -> worker::Result<()
         Err(_) => 0,
     };
 
-    const MAX_REQUESTS_PER_DAY: u32 = 2;
+    const MAX_REQUESTS_PER_DAY: u32 = 5;
 
     if current_count >= MAX_REQUESTS_PER_DAY {
         return Err(AppError::RateLimitExceeded(format!(
