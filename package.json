@@ -1,0 +1,15 @@
+{
+  "name": "emobanana",
+  "version": "1.0.0",
+  "description": "Emoji-based facial expression transformation using Gemini 2.5 Flash Image API",
+  "main": "index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "validate:openapi": "npx @redocly/cli lint openapi.yaml --config .redocly.yaml"
+  },
+  "devDependencies": {
+    "wrangler": "^4.25.0"
+  }
+}
