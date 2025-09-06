@@ -49,4 +49,4 @@ jobs:
         run: cargo build --release
 
       - name: Test backend build for worker
-        run: worker-build --release --no-opt
+        run: cd backend && worker-build --release --no-opt
