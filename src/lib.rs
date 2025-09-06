@@ -48,20 +48,6 @@ Privacy Policy: /privacy-policy"#)
                 })
         })
         .post_async("/transform", handle_transform)
-        .get_async("/debug", |_req, ctx| async move {
-            let env = ctx.env;
-            
-            // Test if we can access the secret
-            let api_key_status = if let Ok(_secret) = env.secret("GEMINI_API_KEY") {
-                "SECRET_OK"
-            } else if let Ok(_var) = env.var("GEMINI_API_KEY") {
-                "VAR_OK"
-            } else {
-                "NOT_FOUND"
-            };
-            
-            Response::ok(format!("Debug: API_KEY_STATUS={}", api_key_status))
-        })
         .run(req, env)
         .await
 }
