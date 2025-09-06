@@ -8,3 +8,13 @@ build/
 .env.local
 .env.*.local
 .dev.varstarget/
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.webp
+*.svg
