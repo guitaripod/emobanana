@@ -6,6 +6,7 @@ use std::fs;
 use std::path::Path;
 #[cfg(feature = "cli")]
 use reqwest::Client;
+#[cfg(feature = "cli")]
 use serde::Serialize;
 use base64::Engine;
 
