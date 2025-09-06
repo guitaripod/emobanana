@@ -1,6 +1,6 @@
 use crate::error::AppError;
 use serde::{Deserialize, Serialize};
-use worker::{console_log, Env, Fetch, Headers, Method, Request as WorkerRequest, Result};
+use worker::{Env, Fetch, Headers, Method, Request as WorkerRequest, Result};
 
 const GEMINI_API_URL: &str = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent";
 
