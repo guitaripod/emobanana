@@ -9,6 +9,14 @@ pub struct TransformRequest {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TransformResponse {
     pub transformed_image: String,
+    pub metadata: TransformMetadata,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TransformMetadata {
+    pub processing_time_ms: u64,
+    pub model_version: String,
+    pub request_id: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
