@@ -105,7 +105,7 @@ async fn check_rate_limit(req: &Request, env: &worker::Env) -> worker::Result<()
 
     let new_count = current_count + 1;
     if let Err(_) = kv.put(&key, new_count)?.execute().await {
-        worker::console_log!("Warning: Failed to update rate limit counter");
+        // KV update failed, but we don't want to block the user
     }
 
     Ok(())
