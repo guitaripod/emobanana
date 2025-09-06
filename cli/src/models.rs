@@ -28,8 +28,11 @@ pub struct ErrorResponse {
 pub struct ErrorDetail {
     pub message: String,
     #[serde(rename = "type")]
+    #[allow(dead_code)]
     pub error_type: String,
+    #[allow(dead_code)]
     pub param: Option<String>,
+    #[allow(dead_code)]
     pub code: Option<String>,
 }
 

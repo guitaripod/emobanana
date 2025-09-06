@@ -47,7 +47,9 @@ pub struct Args {
 }
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct AppConfig {
+    #[allow(dead_code)]
     pub default_url: String,
 }
 
@@ -60,6 +62,7 @@ impl Default for AppConfig {
 }
 
 impl AppConfig {
+    #[allow(dead_code)]
     pub fn load() -> Result<Self, ConfigError> {
         let settings = Config::builder()
             .add_source(config::File::with_name("emobanana").required(false))

@@ -24,6 +24,7 @@ pub enum EmobananaError {
     FileNotFound(String),
 
     #[error("Invalid image format")]
+    #[allow(dead_code)]
     InvalidImageFormat,
 }
 
