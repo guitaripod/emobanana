@@ -1,0 +1,136 @@
+openapi: 3.0.3
+info:
+  title: Emobanana API
+  description: |
+    Emoji-based facial expression transformation using Gemini 2.5 Flash Image API.
+    Transform creature facial expressions in images to match selected emojis.
+  version: 1.0.0
+  contact:
+    name: API Support
+    url: https://github.com/yourusername/emobanana
+  license:
+    name: MIT
+    url: https://github.com/yourusername/emobanana/blob/main/LICENSE
+
+externalDocs:
+  description: Find more info on GitHub
+  url: https://github.com/yourusername/emobanana
+
+servers:
+  - url: https://emobanana.yourusername.workers.dev
+    description: Production server
+
+tags:
+  - name: Transformation
+    description: Image transformation endpoints
+
+paths:
+  /:
+    get:
+      operationId: healthCheck
+      summary: Health check
+      description: Returns a simple health check message
+      tags: [Health]
+      security: []
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Emobanana - Emoji-based facial expression transformation"
+
+  /transform:
+    post:
+      operationId: transformImage
+      summary: Transform facial expression
+      description: Transform the facial expression of a creature in an image to match a selected emoji
+      tags: [Transformation]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransformRequest"
+      responses:
+        "200":
+          description: Transformation successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransformResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+components:
+  schemas:
+    TransformRequest:
+      type: object
+      required:
+        - image
+        - emoji
+      properties:
+        image:
+          type: string
+          description: Base64 encoded image data or data URL
+          example: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ..."
+        emoji:
+          type: string
+          description: Emoji to match the facial expression to
+          example: "😊"
+
+    TransformResponse:
+      type: object
+      required:
+        - transformed_image
+      properties:
+        transformed_image:
+          type: string
+          description: Base64 encoded transformed image
+          example: "/9j/4AAQSkZJRgABAQAAAQ..."
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          $ref: "#/components/schemas/ErrorDetail"
+
+    ErrorDetail:
+      type: object
+      required:
+        - message
+        - type
+      properties:
+        message:
+          type: string
+          description: Human-readable error message
+        type:
+          type: string
+          description: Error type identifier
+        param:
+          type: string
+          description: Parameter that caused the error
+        code:
+          type: string
+          description: Error code
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
