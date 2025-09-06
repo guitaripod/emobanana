@@ -1,5 +1,5 @@
 name = "emobanana"
-main = "build/worker/shim.mjs"
+main = "backend/build/worker/shim.mjs"
 compatibility_date = "2024-01-01"
 
 # KV namespace for rate limiting
@@ -8,7 +8,7 @@ kv_namespaces = [
 ]
 
 [build]
-command = "cargo install -q worker-build && ~/.cargo/bin/worker-build --release --no-opt"
+command = "cd backend && cargo install -q worker-build && ~/.cargo/bin/worker-build --release --no-opt"
 
 # GEMINI_API_KEY is loaded from .dev.vars for local dev
 # For production, set as secret: wrangler secret put GEMINI_API_KEY
