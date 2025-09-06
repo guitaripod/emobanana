@@ -106,42 +106,29 @@ impl GeminiProvider {
     }
 
     pub async fn transform_image(&self, image_data: &str, emoji: &str) -> Result<String> {
-        console_log!("Starting transform_image with emoji: {}", emoji);
-        
         const MAX_RETRIES: u32 = 3;
         let mut last_error: Option<AppError> = None;
-        
+
         for attempt in 1..=MAX_RETRIES {
-            console_log!("Attempt {} of {}", attempt, MAX_RETRIES);
-            
             let result = self.try_transform_once(image_data, emoji).await;
-            
+
             match result {
-                Ok(image_data) => {
-                    console_log!("Success on attempt {}", attempt);
-                    return Ok(image_data);
-                }
+                Ok(image_data) => return Ok(image_data),
                 Err(e) => {
                     let error_msg = e.to_string();
-                    console_log!("Attempt {} failed: {}", attempt, error_msg);
-                    
-                    // Check if it's a PROHIBITED_CONTENT error that we should retry
+
                     if error_msg.contains("PROHIBITED_CONTENT") || error_msg.contains("Content flagged as inappropriate") {
                         last_error = Some(AppError::InternalError(error_msg));
                         if attempt < MAX_RETRIES {
-                            console_log!("Retrying due to content policy (attempt {} failed)", attempt);
                             continue;
                         }
                     } else {
-                        // For non-content-policy errors, fail immediately
                         return Err(e);
                     }
                 }
             }
         }
-        
-        // All retries exhausted
-        console_log!("All {} attempts failed due to content policy", MAX_RETRIES);
+
         Err(last_error.unwrap_or(AppError::InternalError("Failed after retries".to_string())).into())
     }
 
@@ -162,46 +149,30 @@ impl GeminiProvider {
             }],
         };
 
-        console_log!("Calling Gemini API...");
         let response = self.call_gemini_api(gemini_request).await?;
-        console_log!("Gemini API call completed");
-
-        console_log!("Processing {} candidates", response.candidates.len());
 
         if response.candidates.is_empty() {
             return Err(AppError::InternalError("No response from Gemini".to_string()).into());
         }
 
-        for (i, candidate) in response.candidates.iter().enumerate() {
-            console_log!("Processing candidate {}", i);
-
+        for candidate in response.candidates.iter() {
             if let Some(finish_reason) = &candidate.finish_reason {
-                console_log!("Finish reason: {}", finish_reason);
                 if finish_reason == "PROHIBITED_CONTENT" {
                     return Err(AppError::InternalError("PROHIBITED_CONTENT".to_string()).into());
                 }
             }
 
             if let Some(content) = &candidate.content {
-                console_log!("Candidate has {} parts", content.parts.len());
-                for (j, part) in content.parts.iter().enumerate() {
-                    console_log!("Processing part {}", j);
+                for part in content.parts.iter() {
                     match part {
                         GeminiPart::Image { inline_data } => {
-                            console_log!("Found image! Size: {}", inline_data.data.len());
                             return Ok(inline_data.data.clone());
                         }
-                        GeminiPart::Text { text } => {
-                            console_log!("Found text: {}", &text[..text.len().min(100)]);
-                        }
+                        GeminiPart::Text { .. } => {}
                     }
                 }
-            } else {
-                console_log!("Candidate has no content");
             }
         }
-
-        console_log!("No image found in response");
         Err(AppError::InternalError(
             "Gemini did not return an image. Try a different photo or emoji.".to_string(),
         )

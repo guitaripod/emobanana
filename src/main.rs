@@ -80,18 +80,15 @@ struct ErrorDetail {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
-    // Check if image file exists
     if !Path::new(&args.image).exists() {
         eprintln!("Error: Image file '{}' does not exist", args.image);
         std::process::exit(1);
     }
 
-    // Read and encode image
     let image_data = fs::read(&args.image)?;
     let base64_image = base64::engine::general_purpose::STANDARD.encode(image_data);
     let data_url = format!("data:image/png;base64,{}", base64_image);
 
-    // Create request
     let request = TransformRequest {
         image: data_url,
         emoji: args.emoji.clone(),
@@ -102,7 +99,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Emoji: {}", args.emoji);
     println!("Backend URL: {}", args.url);
 
-    // Send request
     let client = Client::new();
     let response = client
         .post(format!("{}/transform", args.url))
@@ -117,7 +113,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("Processing time: {}ms", transform_response.metadata.processing_time_ms);
         println!("Model version: {}", transform_response.metadata.model_version);
 
-        // Decode and save the transformed image
         let base64_data = if transform_response.transformed_image.starts_with("data:") {
             let parts: Vec<&str> = transform_response.transformed_image.split(',').collect();
             if parts.len() == 2 {

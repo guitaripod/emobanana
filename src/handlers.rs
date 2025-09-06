@@ -9,7 +9,6 @@ pub async fn handle_transform(mut req: Request, ctx: RouteContext<()>) -> Result
     let start_time = worker::Date::now().as_millis() as u64;
     let request_id = Uuid::new_v4().to_string();
 
-    // Rate limiting check
     if let Err(rate_limit_error) = check_rate_limit(&req, &env).await {
         return AppError::from(rate_limit_error).to_response();
     }
