@@ -107,7 +107,45 @@ impl GeminiProvider {
 
     pub async fn transform_image(&self, image_data: &str, emoji: &str) -> Result<String> {
         console_log!("Starting transform_image with emoji: {}", emoji);
+        
+        const MAX_RETRIES: u32 = 3;
+        let mut last_error: Option<AppError> = None;
+        
+        for attempt in 1..=MAX_RETRIES {
+            console_log!("Attempt {} of {}", attempt, MAX_RETRIES);
+            
+            let result = self.try_transform_once(image_data, emoji).await;
+            
+            match result {
+                Ok(image_data) => {
+                    console_log!("Success on attempt {}", attempt);
+                    return Ok(image_data);
+                }
+                Err(e) => {
+                    let error_msg = e.to_string();
+                    console_log!("Attempt {} failed: {}", attempt, error_msg);
+                    
+                    // Check if it's a PROHIBITED_CONTENT error that we should retry
+                    if error_msg.contains("PROHIBITED_CONTENT") || error_msg.contains("Content flagged as inappropriate") {
+                        last_error = Some(AppError::InternalError(error_msg));
+                        if attempt < MAX_RETRIES {
+                            console_log!("Retrying due to content policy (attempt {} failed)", attempt);
+                            continue;
+                        }
+                    } else {
+                        // For non-content-policy errors, fail immediately
+                        return Err(e);
+                    }
+                }
+            }
+        }
+        
+        // All retries exhausted
+        console_log!("All {} attempts failed due to content policy", MAX_RETRIES);
+        Err(last_error.unwrap_or(AppError::InternalError("Failed after retries".to_string())).into())
+    }
 
+    async fn try_transform_once(&self, image_data: &str, emoji: &str) -> Result<String> {
         let prompt = format!("Please edit this photo by changing the person's facial expression to look more like this emoji: {}. Make the facial expression match the mood of the emoji while keeping everything else the same.", emoji);
 
         let gemini_request = GeminiRequest {
@@ -140,11 +178,7 @@ impl GeminiProvider {
             if let Some(finish_reason) = &candidate.finish_reason {
                 console_log!("Finish reason: {}", finish_reason);
                 if finish_reason == "PROHIBITED_CONTENT" {
-                    return Err(AppError::InternalError(
-                        "Content flagged as inappropriate. Try a different image or emoji."
-                            .to_string(),
-                    )
-                    .into());
+                    return Err(AppError::InternalError("PROHIBITED_CONTENT".to_string()).into());
                 }
             }
 
