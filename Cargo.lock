@@ -259,23 +259,32 @@ dependencies = [
 ]
 
 [[package]]
-name = "emobanana"
+name = "emobanana-backend"
 version = "0.1.0"
 dependencies = [
  "async-trait",
  "base64",
  "chrono",
- "clap",
  "console_error_panic_hook",
  "futures",
- "reqwest",
  "serde",
  "serde_json",
- "tokio",
  "url",
  "urlencoding",
  "uuid",
  "worker",
+]
+
+[[package]]
+name = "emobanana-cli"
+version = "0.1.0"
+dependencies = [
+ "base64",
+ "clap",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tokio",
 ]
 
 [[package]]
