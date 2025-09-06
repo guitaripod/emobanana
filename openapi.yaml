@@ -63,6 +63,8 @@ paths:
                 $ref: "#/components/schemas/TransformResponse"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "429":
+          $ref: "#/components/responses/RateLimitExceeded"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -87,11 +89,34 @@ components:
       type: object
       required:
         - transformed_image
+        - metadata
       properties:
         transformed_image:
           type: string
           description: Base64 encoded transformed image
           example: "/9j/4AAQSkZJRgABAQAAAQ..."
+        metadata:
+          $ref: "#/components/schemas/TransformMetadata"
+
+    TransformMetadata:
+      type: object
+      required:
+        - processing_time_ms
+        - model_version
+        - request_id
+      properties:
+        processing_time_ms:
+          type: integer
+          description: Time taken to process the request in milliseconds
+          example: 2500
+        model_version:
+          type: string
+          description: Version of the AI model used for transformation
+          example: "gemini-2.5-flash-image-preview"
+        request_id:
+          type: string
+          description: Unique identifier for this request
+          example: "550e8400-e29b-41d4-a716-446655440000"
 
     ErrorResponse:
       type: object
@@ -130,6 +155,13 @@ components:
 
     InternalServerError:
       description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+    RateLimitExceeded:
+      description: Rate limit exceeded
       content:
         application/json:
           schema:

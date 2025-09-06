@@ -12,7 +12,8 @@ Emobanana allows users to upload an image containing a creature and transform it
 - Powered by Gemini 2.5 Flash Image API
 - Simple REST API
 - No authentication required
-- Free tier usage (100 requests/day)
+- Rate limited to 5 requests per day per IP address
+- Free tier usage
 
 ## API
 
@@ -35,7 +36,12 @@ Transform the facial expression of a creature in an image to match an emoji.
 
 ```json
 {
-  "transformed_image": "/9j/4AAQSkZJRgABAQAAAQ..."
+  "transformed_image": "/9j/4AAQSkZJRgABAQAAAQ...",
+  "metadata": {
+    "processing_time_ms": 2500,
+    "model_version": "gemini-2.5-flash-image-preview",
+    "request_id": "550e8400-e29b-41d4-a716-446655440000"
+  }
 }
 ```
 
