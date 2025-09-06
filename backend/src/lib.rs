@@ -7,13 +7,26 @@ mod providers;
 
 use handlers::handle_transform;
 
+fn add_cors_headers(mut response: Response) -> Result<Response> {
+    response.headers_mut().set("Access-Control-Allow-Origin", "*")?;
+    response.headers_mut().set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")?;
+    response.headers_mut().set("Access-Control-Allow-Headers", "Content-Type")?;
+    response.headers_mut().set("Access-Control-Max-Age", "86400")?;
+    Ok(response)
+}
+
 #[event(fetch)]
 async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     console_error_panic_hook::set_once();
 
+    // Handle CORS preflight requests
+    if req.method() == Method::Options {
+        return add_cors_headers(Response::empty()?);
+    }
+
     let router = Router::new();
 
-    router
+    let response = router
         .get("/", |_, _| {
             Response::ok(r#"Emobanana - Emoji-based facial expression transformation
 
@@ -49,5 +62,11 @@ Privacy Policy: /privacy-policy"#)
         })
         .post_async("/transform", handle_transform)
         .run(req, env)
-        .await
+        .await;
+    
+    // Add CORS headers to all responses
+    match response {
+        Ok(resp) => add_cors_headers(resp),
+        Err(e) => Err(e)
+    }
 }
