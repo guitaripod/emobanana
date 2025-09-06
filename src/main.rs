@@ -1,10 +1,15 @@
+#[cfg(feature = "cli")]
 use clap::Parser;
+#[cfg(feature = "cli")]
 use std::fs;
+#[cfg(feature = "cli")]
 use std::path::Path;
+#[cfg(feature = "cli")]
 use reqwest::Client;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use base64::Engine;
 
+#[cfg(feature = "cli")]
 #[derive(Parser)]
 #[command(name = "emobanana-cli")]
 #[command(about = "CLI tool to test the Emobanana backend API")]
@@ -26,30 +31,50 @@ struct Args {
     output: String,
 }
 
-#[derive(Serialize)]
+#[cfg(feature = "cli")]
+#[derive(serde::Serialize)]
 struct TransformRequest {
     image: String,
     emoji: String,
 }
 
-#[derive(Deserialize)]
+#[cfg(feature = "cli")]
+#[derive(serde::Deserialize)]
 struct TransformResponse {
     transformed_image: String,
+    metadata: TransformMetadata,
 }
 
-#[derive(Deserialize)]
+#[cfg(feature = "cli")]
+#[derive(serde::Deserialize)]
+struct TransformMetadata {
+    processing_time_ms: u64,
+    model_version: String,
+    request_id: String,
+}
+
+#[cfg(feature = "cli")]
+#[derive(serde::Deserialize)]
 struct ErrorResponse {
     error: ErrorDetail,
 }
 
-#[derive(Deserialize)]
+#[cfg(feature = "cli")]
+#[derive(serde::Deserialize)]
 struct ErrorDetail {
     message: String,
     #[serde(rename = "type")]
     #[allow(dead_code)]
     error_type: String,
+    #[allow(dead_code)]
+    param: Option<String>,
+    #[allow(dead_code)]
+    code: Option<String>,
 }
 
+
+
+#[cfg(feature = "cli")]
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
@@ -87,6 +112,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if response.status().is_success() {
         let transform_response: TransformResponse = response.json().await?;
         println!("Transformation successful!");
+        println!("Request ID: {}", transform_response.metadata.request_id);
+        println!("Processing time: {}ms", transform_response.metadata.processing_time_ms);
+        println!("Model version: {}", transform_response.metadata.model_version);
 
         // Decode and save the transformed image
         let base64_data = if transform_response.transformed_image.starts_with("data:") {
