@@ -48,6 +48,40 @@ pub async fn handle_transform(mut req: Request, ctx: RouteContext<()>) -> Result
 
     let processing_time_ms = worker::Date::now().as_millis() as u64 - start_time;
 
+    // Increment rate limit counter only on successful transformation
+    if let Ok(kv) = env.kv("RATE_LIMIT_KV") {
+        let client_ip = req.headers().get("CF-Connecting-IP")
+            .or_else(|_| req.headers().get("X-Forwarded-For"))
+            .or_else(|_| req.headers().get("X-Real-IP"))
+            .unwrap_or_else(|_| Some("unknown".to_string()))
+            .unwrap_or_else(|| "unknown".to_string());
+
+        if client_ip != "unknown" {
+            let date_string = worker::Date::now().to_string();
+            let today = if let Some(date_part) = date_string.split('T').next() {
+                if let Some(date_only) = date_part.split(' ').next() {
+                    date_only.to_string()
+                } else {
+                    date_part.to_string()
+                }
+            } else {
+                "unknown".to_string()
+            };
+            let key = format!("rate_limit_v2:{}:{}", client_ip, today);
+
+            let current_count: u32 = match kv.get(&key).text().await {
+                Ok(Some(count_str)) => count_str.parse().unwrap_or(0),
+                Ok(None) => 0,
+                Err(_) => 0,
+            };
+
+            let new_count = current_count + 1;
+            if let Err(_) = kv.put(&key, new_count)?.execute().await {
+                // KV update failed, but don't fail the request
+            }
+        }
+    }
+
     let response = TransformResponse {
         transformed_image,
         metadata: TransformMetadata {
@@ -86,7 +120,7 @@ async fn check_rate_limit(req: &Request, env: &worker::Env) -> worker::Result<()
     } else {
         "unknown".to_string()
     };
-    let key = format!("rate_limit:{}:{}", client_ip, today);
+    let key = format!("rate_limit_v2:{}:{}", client_ip, today);
 
     let current_count: u32 = match kv.get(&key).text().await {
         Ok(Some(count_str)) => count_str.parse().unwrap_or(0),
@@ -94,18 +128,13 @@ async fn check_rate_limit(req: &Request, env: &worker::Env) -> worker::Result<()
         Err(_) => 0,
     };
 
-    const MAX_REQUESTS_PER_DAY: u32 = 5;
+    const MAX_REQUESTS_PER_DAY: u32 = 2;
 
     if current_count >= MAX_REQUESTS_PER_DAY {
         return Err(AppError::RateLimitExceeded(format!(
             "Rate limit exceeded. You can make {} requests per day. Try again tomorrow.",
             MAX_REQUESTS_PER_DAY
         )).into());
-    }
-
-    let new_count = current_count + 1;
-    if let Err(_) = kv.put(&key, new_count)?.execute().await {
-        // KV update failed, but we don't want to block the user
     }
 
     Ok(())
