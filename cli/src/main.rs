@@ -1,52 +1,66 @@
-#[cfg(feature = "cli")]
 use clap::Parser;
-#[cfg(feature = "cli")]
 use std::fs;
-#[cfg(feature = "cli")]
 use std::path::Path;
-#[cfg(feature = "cli")]
 use reqwest::Client;
-#[cfg(feature = "cli")]
-use serde::Serialize;
 use base64::Engine;
 
-#[cfg(feature = "cli")]
 #[derive(Parser)]
-#[command(name = "emobanana-cli")]
-#[command(about = "CLI tool to test the Emobanana backend API")]
+#[command(
+    name = "emobanana-cli",
+    version,
+    about = "Transform creature facial expressions using emoji prompts",
+    long_about = "A command-line tool to test the Emobanana API by transforming creature facial expressions in images to match emoji emotions.
+
+EXAMPLES:
+    # Transform a cat to look happy
+    emobanana-cli -i cat.jpg -e 😊
+
+    # Use custom output filename
+    emobanana-cli --image dog.png --emoji 😢 --output sad_dog.png
+
+    # Test against local development server
+    emobanana-cli -i bird.jpg -e 😠 -u http://localhost:8787"
+)]
 struct Args {
-    /// Path to the input image file
-    #[arg(short, long)]
+    /// Path to the input image file (JPEG, PNG, etc.)
+    #[arg(short, long, help = "Path to the image file containing a creature to transform")]
     image: String,
 
-    /// Emoji to use for transformation
-    #[arg(short, long)]
+    /// Emoji to use for facial expression transformation
+    #[arg(short, long, help = "Emoji representing the desired facial expression (e.g., 😊, 😢, 😠)")]
     emoji: String,
 
-    /// Backend API URL (default: https://emobanana.guitaripod.workers.dev)
-    #[arg(short, long, default_value = "https://emobanana.guitaripod.workers.dev")]
+    /// Backend API URL
+    #[arg(
+        short,
+        long,
+        default_value = "https://emobanana.guitaripod.workers.dev",
+        help = "URL of the Emobanana backend API"
+    )]
     url: String,
 
     /// Output file path for the transformed image
-    #[arg(short, long, default_value = "transformed.png")]
+    #[arg(
+        short,
+        long,
+        default_value = "transformed.png",
+        help = "Path where the transformed image will be saved"
+    )]
     output: String,
 }
 
-#[cfg(feature = "cli")]
 #[derive(serde::Serialize)]
 struct TransformRequest {
     image: String,
     emoji: String,
 }
 
-#[cfg(feature = "cli")]
 #[derive(serde::Deserialize)]
 struct TransformResponse {
     transformed_image: String,
     metadata: TransformMetadata,
 }
 
-#[cfg(feature = "cli")]
 #[derive(serde::Deserialize)]
 struct TransformMetadata {
     processing_time_ms: u64,
@@ -54,13 +68,11 @@ struct TransformMetadata {
     request_id: String,
 }
 
-#[cfg(feature = "cli")]
 #[derive(serde::Deserialize)]
 struct ErrorResponse {
     error: ErrorDetail,
 }
 
-#[cfg(feature = "cli")]
 #[derive(serde::Deserialize)]
 struct ErrorDetail {
     message: String,
@@ -73,9 +85,6 @@ struct ErrorDetail {
     code: Option<String>,
 }
 
-
-
-#[cfg(feature = "cli")]
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
