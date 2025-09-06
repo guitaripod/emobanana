@@ -2,9 +2,14 @@
 
 Emoji-based facial expression transformation using Gemini 2.5 Flash Image API.
 
-## Overview
+## Project Structure
 
-Emobanana allows users to upload an image containing a creature and transform its facial expression to match a selected emoji using Google's Gemini 2.5 Flash Image API.
+```
+emobanana/
+├── cli/           # Command-line tool for testing the API
+├── backend/       # Cloudflare Worker backend
+└── Cargo.toml     # Workspace configuration
+```
 
 ## Features
 
@@ -13,17 +18,12 @@ Emobanana allows users to upload an image containing a creature and transform it
 - Simple REST API
 - No authentication required
 - Rate limited to 5 requests per day per IP address
-- Free tier usage
 
 ## API
 
 ### Transform Image
 
 **POST** `/transform`
-
-Transform the facial expression of a creature in an image to match an emoji.
-
-**Request Body:**
 
 ```json
 {
@@ -33,7 +33,6 @@ Transform the facial expression of a creature in an image to match an emoji.
 ```
 
 **Response:**
-
 ```json
 {
   "transformed_image": "/9j/4AAQSkZJRgABAQAAAQ...",
@@ -47,86 +46,45 @@ Transform the facial expression of a creature in an image to match an emoji.
 
 ## Setup
 
-### Local Development
+### Backend (Cloudflare Worker)
 
 1. Install dependencies:
-
    ```bash
    npm install
    ```
 
-2. Create `.dev.vars` file with your Gemini API key:
-
-   ```bash
-   echo "GEMINI_API_KEY=your_api_key_here" > .dev.vars
-   ```
-
-3. Run locally:
-   ```bash
-   npx wrangler dev
-   ```
-
-### Production Deployment
-
-1. Set the Gemini API key as a secret:
-
+2. Set Gemini API key:
    ```bash
    npx wrangler secret put GEMINI_API_KEY
    ```
 
-2. Deploy to Cloudflare Workers:
-
+3. Deploy:
    ```bash
    npx wrangler deploy
    ```
 
-3. Configure Gemini API key in `wrangler.toml`
+### CLI Tool
 
-4. Deploy to Cloudflare Workers:
+1. Build:
    ```bash
-   npx wrangler deploy
+   cargo build -p emobanana-cli
    ```
 
-## CLI Tool
+2. Run:
+   ```bash
+   cargo run -p emobanana-cli -- -i cat.jpg -e 😊
+   ```
 
-A command-line tool is available for testing the backend API locally.
-
-### Build the CLI
-
-```bash
-cargo build --bin emobanana-cli
-```
-
-### Usage
-
-```bash
-cargo run --bin emobanana-cli -- --image path/to/image.jpg --emoji 😊
-```
-
-### CLI Options
-
-- `-i, --image <IMAGE>`: Path to the input image file
-- `-e, --emoji <EMOJI>`: Emoji to use for transformation
-- `-u, --url <URL>`: Backend API URL (default: https://emobanana.guitaripod.workers.dev)
-- `-o, --output <OUTPUT>`: Output file path for the transformed image (default: transformed.png)
-
-### Example
-
-```bash
-# Transform a cat image to have a happy expression
-cargo run --bin emobanana-cli -- --image cat.jpg --emoji 😺 --output happy_cat.png
-
-# Use a different backend URL
-cargo run --bin emobanana-cli -- --image dog.jpg --emoji 🐕 --url https://emobanana.guitaripod.workers.dev
-```
+3. Get help:
+   ```bash
+   cargo run -p emobanana-cli -- --help
+   ```
 
 ## Development
 
-1. Install wrangler CLI
-2. Run locally:
-    ```bash
-    npx wrangler dev
-    ```
+- **Backend**: `cd backend && cargo build`
+- **CLI**: `cd cli && cargo build`
+- **Both**: `cargo build`
 
 ## License
 
