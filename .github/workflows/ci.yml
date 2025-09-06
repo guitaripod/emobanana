@@ -50,3 +50,17 @@ jobs:
 
       - name: Test backend build for worker
         run: cd backend && worker-build --release --no-opt
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install web dependencies
+        run: cd web && npm install
+
+      - name: Build web app
+        run: cd web && npm run build
+
+      - name: Test CLI
+        run: cargo test
