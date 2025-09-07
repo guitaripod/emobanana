@@ -46,6 +46,7 @@ Thumbs.db
 
 # Rust
 rust-analyzer/
+*.bak
 
 # Images
 images/
