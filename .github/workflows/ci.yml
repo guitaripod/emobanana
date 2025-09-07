@@ -5,44 +5,57 @@ on:
     branches: ["**"]
 
 jobs:
-  backend:
-    name: Backend tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+   backend:
+     name: Backend tests
+     runs-on: ubuntu-latest
+     steps:
+       - uses: actions/checkout@v4
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+       - name: Setup Node.js
+         uses: actions/setup-node@v4
+         with:
+           node-version: '18'
 
-      - name: Install worker-build
-        run: cargo install worker-build
+       - name: Install Rust
+         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/registry
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+       - name: Install worker-build
+         run: cargo install worker-build
 
-      - name: Cache cargo index
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/git
-          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+       - name: Cache cargo registry
+         uses: actions/cache@v4
+         with:
+           path: ~/.cargo/registry
+           key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Cache cargo build
-        uses: actions/cache@v4
-        with:
-          path: target
-          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+       - name: Cache cargo index
+         uses: actions/cache@v4
+         with:
+           path: ~/.cargo/git
+           key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Check backend
-        run: cargo check --package emobanana-backend
+       - name: Cache cargo build
+         uses: actions/cache@v4
+         with:
+           path: target
+           key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Build backend
-        run: cargo build --package emobanana-backend --release
+       - name: Build web app (for backend assets)
+         run: |
+           cd web
+           npm install
+           npm run build
+           cd ..
+           cp -r web/dist/* backend/
 
-      - name: Test backend build for worker
-        run: cd backend && worker-build --release --no-opt
+       - name: Check backend
+         run: cargo check --package emobanana-backend
+
+       - name: Build backend
+         run: cargo build --package emobanana-backend --release
+
+       - name: Test backend build for worker
+         run: cd backend && worker-build --release --no-opt
 
   cli:
     name: CLI tests
