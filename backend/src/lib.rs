@@ -67,6 +67,41 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
                     r
                 })
         })
+        .get("/og-banner.png", |_, _| {
+            Response::from_bytes(include_bytes!("../og-banner.png").to_vec())
+                .map(|mut r| {
+                    r.headers_mut().set("Content-Type", "image/png").unwrap();
+                    r
+                })
+        })
+        .get("/apple-touch-icon.png", |_, _| {
+            Response::from_bytes(include_bytes!("../apple-touch-icon.png").to_vec())
+                .map(|mut r| {
+                    r.headers_mut().set("Content-Type", "image/png").unwrap();
+                    r
+                })
+        })
+        .get("/favicon-32x32.png", |_, _| {
+            Response::from_bytes(include_bytes!("../favicon-32x32.png").to_vec())
+                .map(|mut r| {
+                    r.headers_mut().set("Content-Type", "image/png").unwrap();
+                    r
+                })
+        })
+        .get("/favicon-16x16.png", |_, _| {
+            Response::from_bytes(include_bytes!("../favicon-16x16.png").to_vec())
+                .map(|mut r| {
+                    r.headers_mut().set("Content-Type", "image/png").unwrap();
+                    r
+                })
+        })
+        .get("/site.webmanifest", |_, _| {
+            Response::ok(include_str!("../site.webmanifest"))
+                .map(|mut r| {
+                    r.headers_mut().set("Content-Type", "application/manifest+json").unwrap();
+                    r
+                })
+        })
         .get("/_astro/index.CWD5hzu9.css", |_, _| {
             Response::ok(include_str!("../_astro/index.CWD5hzu9.css"))
                 .map(|mut r| {
