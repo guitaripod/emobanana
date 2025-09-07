@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import EmojiGrid from './EmojiGrid';
 import ImageUpload from './ImageUpload';
 import TransformResult from './TransformResult';
+import ErrorDisplay from './ErrorDisplay';
 
 const API_URL = import.meta.env.PUBLIC_API_URL || 'https://emobanana.guitaripod.workers.dev';
 
@@ -16,13 +17,28 @@ interface TransformResponse {
   };
 }
 
+interface ErrorResponse {
+  error: {
+    message: string;
+    type: string;
+    param?: string;
+    code?: string;
+    suggestion?: string;
+  };
+}
+
 export default function EmoBananaApp() {
   const [appState, setAppState] = useState<AppState>('select-image');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
   const [transformedImage, setTransformedImage] = useState<string | null>(null);
   const [processingTime, setProcessingTime] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{
+    message: string;
+    code?: string;
+    type?: string;
+    suggestion?: string;
+  } | null>(null);
   const [requestsRemaining, setRequestsRemaining] = useState<number | null>(null);
 
   const handleImageSelect = useCallback((imageData: string) => {
@@ -51,8 +67,12 @@ export default function EmoBananaApp() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+        const errorData: ErrorResponse = await response.json();
+        const error = new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+        (error as any).code = errorData.error?.code;
+        (error as any).type = errorData.error?.type;
+        (error as any).suggestion = errorData.error?.suggestion;
+        throw error;
       }
 
       const data: TransformResponse = await response.json();
@@ -61,12 +81,23 @@ export default function EmoBananaApp() {
       setAppState('result');
     } catch (err) {
       console.error('Transform error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to transform image');
-      setAppState('error');
-      
-      if (err instanceof Error && err.message.includes('Rate limit')) {
-        setRequestsRemaining(0);
+      if (err instanceof Error) {
+        setError({
+          message: err.message,
+          code: (err as any).code,
+          type: (err as any).type,
+          suggestion: (err as any).suggestion,
+        });
+
+        if (err.message.includes('Rate limit') || (err as any).code === 'rate_limit_exceeded') {
+          setRequestsRemaining(0);
+        }
+      } else {
+        setError({
+          message: 'Failed to transform image',
+        });
       }
+      setAppState('error');
     }
   }, [selectedImage]);
 
@@ -77,13 +108,16 @@ export default function EmoBananaApp() {
     setTransformedImage(null);
     setProcessingTime(null);
     setError(null);
+    setRequestsRemaining(null);
   }, []);
 
   const handleRetry = useCallback(() => {
-    if (selectedEmoji) {
+    if (selectedEmoji && selectedImage) {
+      // Clear error state before retrying
+      setError(null);
       handleEmojiSelect(selectedEmoji);
     }
-  }, [selectedEmoji, handleEmojiSelect]);
+  }, [selectedEmoji, selectedImage, handleEmojiSelect]);
 
   return (
     <div className="min-h-screen py-8 px-4">
@@ -186,31 +220,13 @@ export default function EmoBananaApp() {
             />
           )}
 
-          {appState === 'error' && (
-            <div className="max-w-md mx-auto">
-              <div className="glass rounded-2xl p-8 text-center">
-                <div className="text-6xl mb-4">😕</div>
-                <h2 className="text-xl font-semibold text-slate-700 dark:text-slate-200 mb-2">
-                  Oops! Something went wrong
-                </h2>
-                <p className="text-slate-500 dark:text-slate-400 mb-6">{error}</p>
-                <div className="flex justify-center gap-4">
-                  <button
-                    onClick={handleRetry}
-                    className="px-6 py-3 bg-orange-400 text-white rounded-xl hover:bg-orange-500 dark:hover:bg-orange-600 transition-colors font-medium"
-                  >
-                    Try Again
-                  </button>
-                  <button
-                    onClick={handleReset}
-                    className="px-6 py-3 glass rounded-xl hover:bg-white/50 dark:hover:bg-slate-700/50 transition-colors font-medium"
-                  >
-                    Start Over
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+           {appState === 'error' && (
+             <ErrorDisplay
+               error={error}
+               onRetry={handleRetry}
+               onReset={handleReset}
+             />
+           )}
         </main>
 
         <footer className="mt-16 text-center text-sm text-slate-500 dark:text-slate-400">
