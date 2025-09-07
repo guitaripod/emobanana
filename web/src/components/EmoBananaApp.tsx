@@ -39,7 +39,7 @@ export default function EmoBananaApp() {
     setError(null);
 
     try {
-      const response = await fetch(`${API_URL}/transform`, {
+      const response = await fetch(`${API_URL}/api/transform`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
