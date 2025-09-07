@@ -7,14 +7,14 @@ info:
   version: 1.0.0
   contact:
     name: API Support
-    url: https://github.com/yourusername/emobanana
+    url: https://x.com/guitaripod
   license:
-    name: MIT
-    url: https://github.com/yourusername/emobanana/blob/main/LICENSE
+    name: GNU General Public License 3.0
+    url: https://github.com/guitaripod/emobanana/blob/master/LICENSE
 
 externalDocs:
   description: Find more info on GitHub
-  url: https://github.com/yourusername/emobanana
+  url: https://github.com/guitaripod/emobanana
 
 servers:
   - url: https://emobanana.guitaripod.workers.dev
