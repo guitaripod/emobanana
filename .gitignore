@@ -50,11 +50,17 @@ rust-analyzer/
 
 # Images
 images/
-*.png
 *.jpg
 *.jpeg
 *.gif
 *.bmp
 *.tiff
 *.webp
-*.svg
+
+# Allow specific required PNGs and SVGs for backend compilation
+!backend/og-banner.png
+!backend/apple-touch-icon.png
+!backend/favicon-16x16.png
+!backend/favicon-32x32.png
+!backend/favicon.svg
+!backend/site.webmanifest
