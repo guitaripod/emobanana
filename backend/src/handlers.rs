@@ -48,7 +48,6 @@ pub async fn handle_transform(mut req: Request, ctx: RouteContext<()>) -> Result
 
     let processing_time_ms = worker::Date::now().as_millis() as u64 - start_time;
 
-    // Increment rate limit counter only on successful transformation
     if let Ok(kv) = env.kv("RATE_LIMIT_KV") {
         let client_ip = req.headers().get("CF-Connecting-IP")
             .or_else(|_| req.headers().get("X-Forwarded-For"))
@@ -77,7 +76,6 @@ pub async fn handle_transform(mut req: Request, ctx: RouteContext<()>) -> Result
 
             let new_count = current_count + 1;
             if let Err(_) = kv.put(&key, new_count)?.execute().await {
-                // KV update failed, but don't fail the request
             }
         }
     }
