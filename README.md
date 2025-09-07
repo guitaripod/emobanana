@@ -8,6 +8,8 @@ Emoji-based facial expression transformation using Gemini 2.5 Flash Image API.
 emobanana/
 ├── cli/           # Command-line tool for testing the API
 ├── backend/       # Cloudflare Worker backend
+├── web/           # Astro web application frontend
+├── scripts/       # Build and deployment scripts
 └── Cargo.toml     # Workspace configuration
 ```
 
@@ -23,7 +25,7 @@ emobanana/
 
 ### Transform Image
 
-**POST** `/transform`
+**POST** `/api/transform`
 
 ```json
 {
@@ -46,16 +48,34 @@ emobanana/
 
 ## Setup
 
-### Backend (Cloudflare Worker)
+### Full Application (Web + Backend)
 
 1. Install dependencies:
    ```bash
    npm install
+   cd web && npm install && cd ..
    ```
 
 2. Set Gemini API key:
    ```bash
    npx wrangler secret put GEMINI_API_KEY
+   ```
+
+3. Build and deploy:
+   ```bash
+   ./scripts/build-and-deploy.sh
+   ```
+
+### Manual Deployment
+
+1. Build web app:
+   ```bash
+   cd web && npm run build && cd ..
+   ```
+
+2. Build backend:
+   ```bash
+   cd backend && cargo install -q worker-build && ~/.cargo/bin/worker-build --release --no-opt && cd ..
    ```
 
 3. Deploy:
@@ -82,9 +102,10 @@ emobanana/
 
 ## Development
 
+- **Web App**: `cd web && npm run dev`
 - **Backend**: `cd backend && cargo build`
 - **CLI**: `cd cli && cargo build`
-- **Both**: `cargo build`
+- **All**: `cargo build`
 
 ## License
 
