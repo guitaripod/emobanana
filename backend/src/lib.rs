@@ -67,8 +67,8 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
                     r
                 })
         })
-        .get("/_astro/index.CeofYXSQ.css", |_, _| {
-            Response::ok(include_str!("../_astro/index.CeofYXSQ.css"))
+        .get("/_astro/index.CWD5hzu9.css", |_, _| {
+            Response::ok(include_str!("../_astro/index.CWD5hzu9.css"))
                 .map(|mut r| {
                     r.headers_mut().set("Content-Type", "text/css").unwrap();
                     r
@@ -81,8 +81,8 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
                     r
                 })
         })
-        .get("/_astro/EmoBananaApp.DqbLKN2F.js", |_, _| {
-            Response::ok(include_str!("../_astro/EmoBananaApp.DqbLKN2F.js"))
+        .get("/_astro/EmoBananaApp.Cj1Nby82.js", |_, _| {
+            Response::ok(include_str!("../_astro/EmoBananaApp.Cj1Nby82.js"))
                 .map(|mut r| {
                     r.headers_mut().set("Content-Type", "application/javascript").unwrap();
                     r
