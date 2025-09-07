@@ -48,7 +48,30 @@ pub async fn handle_transform(mut req: Request, ctx: RouteContext<()>) -> Result
 
     let transformed_image = match provider.transform_image(&image_data, &transform_req.emoji).await {
         Ok(img) => img,
-        Err(e) => return AppError::InternalError(format!("Image transformation failed: {}", e)).to_response(),
+        Err(e) => {
+            // Try to extract the specific AppError from the worker::Error
+            let error_str = e.to_string();
+            if let Some(msg) = error_str.strip_prefix("AppError::GeminiContentFiltered::") {
+                return AppError::GeminiContentFiltered(msg.to_string()).to_response();
+            }
+            if let Some(msg) = error_str.strip_prefix("AppError::GeminiApiError::") {
+                return AppError::GeminiApiError(msg.to_string()).to_response();
+            }
+            if let Some(msg) = error_str.strip_prefix("AppError::GeminiQuotaExceeded::") {
+                return AppError::GeminiQuotaExceeded(msg.to_string()).to_response();
+            }
+            if let Some(msg) = error_str.strip_prefix("AppError::GeminiInvalidRequest::") {
+                return AppError::GeminiInvalidRequest(msg.to_string()).to_response();
+            }
+            if let Some(msg) = error_str.strip_prefix("AppError::GeminiTimeout::") {
+                return AppError::GeminiTimeout(msg.to_string()).to_response();
+            }
+            if let Some(msg) = error_str.strip_prefix("AppError::TransformationFailed::") {
+                return AppError::TransformationFailed(msg.to_string()).to_response();
+            }
+            // Fallback to generic error
+            return AppError::InternalError(format!("Image transformation failed: {}", e)).to_response();
+        }
     };
 
     let processing_time_ms = worker::Date::now().as_millis() as u64 - start_time;

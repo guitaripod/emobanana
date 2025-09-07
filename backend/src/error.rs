@@ -168,6 +168,12 @@ impl From<worker::Error> for AppError {
         if let Some(msg) = error_str.strip_prefix("AppError::GeminiQuotaExceeded::") {
             return AppError::GeminiQuotaExceeded(msg.to_string());
         }
+        if let Some(msg) = error_str.strip_prefix("AppError::GeminiApiError::") {
+            return AppError::GeminiApiError(msg.to_string());
+        }
+        if let Some(msg) = error_str.strip_prefix("AppError::GeminiQuotaExceeded::") {
+            return AppError::GeminiQuotaExceeded(msg.to_string());
+        }
         if let Some(msg) = error_str.strip_prefix("AppError::GeminiContentFiltered::") {
             return AppError::GeminiContentFiltered(msg.to_string());
         }
