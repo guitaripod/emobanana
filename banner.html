@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=560, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            width: 560px;
+            height: 280px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1f36 0%, #2d3561 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 48px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #ffa500 0%, #ffd700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .tagline {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+        .upload-area {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .camera-icon {
+            font-size: 28px;
+        }
+        .upload-text {
+            text-align: left;
+        }
+        .upload-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 2px;
+        }
+        .upload-subtitle {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+        .powered-by {
+            position: absolute;
+            bottom: 10px;
+            font-size: 10px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EmoBanana</h1>
+        <p class="tagline">Transform facial expressions with emoji magic ✨</p>
+        <div class="upload-area">
+            <div class="camera-icon">📸</div>
+            <div class="upload-text">
+                <div class="upload-title">Drop your image here</div>
+                <div class="upload-subtitle">JPG, PNG, GIF, WebP (max 10MB)</div>
+            </div>
+        </div>
+    </div>
+    <div class="powered-by">Powered by Gemini 2.5 Flash</div>
+</body>
+</html>
