@@ -139,7 +139,7 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error, onRetry, onReset }) 
                     ? 'text-red-800 dark:text-red-200'
                     : 'text-blue-800 dark:text-blue-200'
                 }`}>
-                  What you can do:
+                  {isContentFiltered ? 'Try this instead:' : 'What you can do:'}
                 </p>
                 <p className={`text-sm leading-relaxed ${
                   isContentFiltered
@@ -191,7 +191,7 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error, onRetry, onReset }) 
           {isContentFiltered && (
             <div className="mt-4 p-4 bg-red-100 dark:bg-red-950/40 border border-red-300 dark:border-red-700 rounded-xl">
               <p className="text-sm text-red-800 dark:text-red-200 font-medium">
-                🔒 This helps keep our AI service safe and appropriate for everyone
+                🔒 Google's Gemini AI service enforces their own content policies
               </p>
             </div>
           )}

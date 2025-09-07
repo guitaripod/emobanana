@@ -166,10 +166,10 @@ impl GeminiProvider {
             if let Some(finish_reason) = &candidate.finish_reason {
                 match finish_reason.as_str() {
                     "PROHIBITED_CONTENT" => {
-                        return Err(AppError::GeminiContentFiltered("This content was flagged as inappropriate by our AI service".to_string()).into());
+                        return Err(AppError::GeminiContentFiltered("This content was flagged as inappropriate by Google's Gemini AI service".to_string()).into());
                     }
                     "SAFETY" => {
-                        return Err(AppError::GeminiContentFiltered("This content violated our safety guidelines".to_string()).into());
+                        return Err(AppError::GeminiContentFiltered("This content violated Google's safety guidelines".to_string()).into());
                     }
                     "RECITATION" => {
                         return Err(AppError::TransformationFailed("Gemini could not process this type of content".to_string()).into());
