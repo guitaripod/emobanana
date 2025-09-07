@@ -215,6 +215,25 @@ export default function EmoBananaApp() {
 
         <footer className="mt-16 text-center text-sm text-slate-500 dark:text-slate-400">
           <p>Powered by Gemini 2.5 Flash • 5 transformations per day</p>
+          <div className="mt-2 space-x-4">
+            <a
+              href="/api/docs"
+              className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              API Docs
+            </a>
+            <span>•</span>
+            <a
+              href="/api/privacy-policy"
+              className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Privacy Policy
+            </a>
+          </div>
         </footer>
       </div>
     </div>
