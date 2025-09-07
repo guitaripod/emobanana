@@ -31,4 +31,5 @@ pub struct ErrorDetail {
     pub error_type: String,
     pub param: Option<String>,
     pub code: Option<String>,
+    pub suggestion: Option<String>,
 }
