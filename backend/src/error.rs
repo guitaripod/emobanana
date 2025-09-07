@@ -84,9 +84,9 @@ impl AppError {
             AppError::GeminiContentFiltered(_msg) => (
                 451,
                 "content_filtered",
-                "Content was filtered by the AI service.".to_string(),
+                "The AI service flagged this content as inappropriate.".to_string(),
                 "gemini_content_filtered",
-                Some("Please try with a different image or emoji.".to_string())
+                Some("Try using a different image or emoji that follows our content guidelines.".to_string())
             ),
             AppError::GeminiInvalidRequest(_msg) => (
                 400,
