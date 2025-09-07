@@ -7,6 +7,10 @@ kv_namespaces = [
   { binding = "RATE_LIMIT_KV", id = "94dfacdd3b824ec293281a8019f4c15c", preview_id = "94dfacdd3b824ec293281a8019f4c15c" }
 ]
 
+# Serve static files from web/dist
+[site]
+bucket = "./web/dist"
+
 [build]
 command = "cd backend && cargo install -q worker-build && ~/.cargo/bin/worker-build --release --no-opt"
 
