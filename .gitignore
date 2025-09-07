@@ -7,6 +7,12 @@ build/
 target/
 *.rs.bk
 
+# Backend static assets (copied from web build)
+backend/_astro/
+backend/index.html
+backend/favicon.svg
+backend/site.webmanifest
+
 # Cloudflare Workers
 .wrangler/
 
