@@ -16,10 +16,12 @@ emobanana/
 ## Features
 
 - Transform creature facial expressions in images to match emojis
-- Powered by Gemini 2.5 Flash Image API
-- Simple REST API
+- Powered by Google's Gemini 2.5 Flash Image Preview model
+- Simple REST API with OpenAPI specification
+- Interactive Swagger UI documentation
 - No authentication required
 - Rate limited to 5 requests per day per IP address
+- Privacy policy included
 
 ## API
 
@@ -46,6 +48,19 @@ emobanana/
 }
 ```
 
+### API Documentation
+
+- **OpenAPI Specification**: Available at `/openapi.yaml`
+- **Swagger UI**: Interactive API documentation at `/swagger-ui.html`
+- **Privacy Policy**: Available at `/privacy_policy.html`
+
+### Validation
+
+Validate the OpenAPI specification:
+```bash
+npm run validate:openapi
+```
+
 ## Setup
 
 ### Full Application (Web + Backend)
@@ -61,10 +76,21 @@ emobanana/
    npx wrangler secret put GEMINI_API_KEY
    ```
 
-3. Build and deploy:
+3. Configure KV namespace (for rate limiting):
+   ```bash
+   # Create a KV namespace for rate limiting
+   npx wrangler kv:namespace create "RATE_LIMIT_KV"
+
+   # Copy the namespace ID from the output and update wrangler.toml
+   # Or use: npx wrangler kv:namespace list
+   ```
+
+4. Build and deploy:
    ```bash
    ./scripts/build-and-deploy.sh
    ```
+
+**Note**: The backend serves static files from the web application, so the build process copies web assets to the backend directory before deployment.
 
 ### Manual Deployment
 
@@ -109,4 +135,4 @@ emobanana/
 
 ## License
 
-MIT
+GNU General Public License v3.0

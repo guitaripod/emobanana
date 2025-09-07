@@ -3,6 +3,8 @@ main = "backend/build/worker/shim.mjs"
 compatibility_date = "2024-01-01"
 
 # KV namespace for rate limiting
+# NOTE: Update the 'id' and 'preview_id' values with your own KV namespace IDs
+# Create with: npx wrangler kv:namespace create "RATE_LIMIT_KV"
 kv_namespaces = [
   { binding = "RATE_LIMIT_KV", id = "94dfacdd3b824ec293281a8019f4c15c", preview_id = "94dfacdd3b824ec293281a8019f4c15c" }
 ]

@@ -1,33 +1,18 @@
-# Astro Starter Kit: Minimal
+# Emobanana Web Frontend
 
-```sh
-npm create astro@latest -- --template minimal
-```
+This is the Astro-based web frontend for Emobanana, providing the user interface for emoji-based facial expression transformation.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## 🚀 Features
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
-
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
+- **React Components**: Built with React for interactive UI components
+- **Tailwind CSS**: Modern styling with utility-first CSS framework
+- **Image Upload**: Drag-and-drop image upload functionality
+- **Real-time Transformation**: Live preview of emoji transformations
+- **Responsive Design**: Mobile-first responsive layout
 
 ## 🧞 Commands
 
-All commands are run from the root of the project, from a terminal:
+All commands are run from the `web/` directory:
 
 | Command                   | Action                                           |
 | :------------------------ | :----------------------------------------------- |
@@ -38,6 +23,45 @@ All commands are run from the root of the project, from a terminal:
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 
-## 👀 Want to learn more?
+## 📁 Project Structure
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+```text
+web/
+├── src/
+│   ├── components/
+│   │   ├── EmoBananaApp.tsx    # Main application component
+│   │   ├── EmojiGrid.tsx       # Emoji selection grid
+│   │   ├── ImageUpload.tsx     # Image upload component
+│   │   └── TransformResult.tsx # Result display component
+│   ├── layouts/
+│   │   └── Layout.astro        # Main page layout
+│   ├── pages/
+│   │   └── index.astro         # Home page
+│   └── styles/
+│       └── global.css          # Global styles
+├── public/                     # Static assets
+└── package.json
+```
+
+## 🔧 Development
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Start development server:
+   ```bash
+   npm run dev
+   ```
+
+3. Open [http://localhost:4321](http://localhost:4321) in your browser
+
+## 📦 Build
+
+Build for production:
+```bash
+npm run build
+```
+
+The built files will be in the `dist/` directory and copied to the backend for deployment.
