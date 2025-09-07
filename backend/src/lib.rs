@@ -67,15 +67,15 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
                     r
                 })
         })
-        .get("/_astro/index.nCNIo1WA.css", |_, _| {
-            Response::ok(include_str!("../_astro/index.nCNIo1WA.css"))
+        .get("/_astro/index.IQ3vksgp.css", |_, _| {
+            Response::ok(include_str!("../_astro/index.IQ3vksgp.css"))
                 .map(|mut r| {
                     r.headers_mut().set("Content-Type", "text/css").unwrap();
                     r
                 })
         })
-        .get("/_astro/EmoBananaApp.aJDWk7M7.js", |_, _| {
-            Response::ok(include_str!("../_astro/EmoBananaApp.aJDWk7M7.js"))
+        .get("/_astro/EmoBananaApp.BxDkulSD.js", |_, _| {
+            Response::ok(include_str!("../_astro/EmoBananaApp.BxDkulSD.js"))
                 .map(|mut r| {
                     r.headers_mut().set("Content-Type", "application/javascript").unwrap();
                     r
@@ -90,6 +90,20 @@ async fn main(req: Request, env: Env, _ctx: Context) -> Result<Response> {
         })
         .get("/_astro/index.RH_Wq4ov.js", |_, _| {
             Response::ok(include_str!("../_astro/index.RH_Wq4ov.js"))
+                .map(|mut r| {
+                    r.headers_mut().set("Content-Type", "application/javascript").unwrap();
+                    r
+                })
+        })
+        .get("/_astro/index.nCNIo1WA.css", |_, _| {
+            Response::ok(include_str!("../_astro/index.nCNIo1WA.css"))
+                .map(|mut r| {
+                    r.headers_mut().set("Content-Type", "text/css").unwrap();
+                    r
+                })
+        })
+        .get("/_astro/EmoBananaApp.aJDWk7M7.js", |_, _| {
+            Response::ok(include_str!("../_astro/EmoBananaApp.aJDWk7M7.js"))
                 .map(|mut r| {
                     r.headers_mut().set("Content-Type", "application/javascript").unwrap();
                     r
