@@ -19,11 +19,16 @@ pub async fn handle_transform(mut req: Request, ctx: RouteContext<()>) -> Result
     };
 
     if transform_req.image.is_empty() {
-        return AppError::BadRequest("Image data is required and cannot be empty".to_string()).to_response();
+        return AppError::BadRequest("Please upload an image to transform".to_string()).to_response();
     }
 
     if transform_req.emoji.is_empty() {
-        return AppError::BadRequest("Emoji is required and cannot be empty".to_string()).to_response();
+        return AppError::BadRequest("Please select an emoji for the transformation".to_string()).to_response();
+    }
+
+    // Validate image format and size
+    if let Err(validation_error) = validate_image_data(&transform_req.image) {
+        return AppError::from(validation_error).to_response();
     }
 
     let provider = match GeminiProvider::new(&env) {
@@ -136,4 +141,69 @@ async fn check_rate_limit(req: &Request, env: &worker::Env) -> worker::Result<()
     }
 
     Ok(())
+}
+
+fn validate_image_data(image_data: &str) -> worker::Result<()> {
+    const MAX_IMAGE_SIZE: usize = 10 * 1024 * 1024; // 10MB
+
+    // Check if it's a data URL
+    if !image_data.starts_with("data:") {
+        return Err(AppError::InvalidImageFormat(
+            "Image must be provided as a data URL (data:image/...)"
+                .to_string(),
+        ).into());
+    }
+
+    // Parse data URL
+    let parts: Vec<&str> = image_data.split(',').collect();
+    if parts.len() != 2 {
+        return Err(AppError::InvalidImageFormat(
+            "Invalid image data URL format".to_string(),
+        ).into());
+    }
+
+    let header = parts[0];
+    let data = parts[1];
+
+    // Validate MIME type
+    if !header.contains("image/") {
+        return Err(AppError::UnsupportedImageType(
+            "Only image files are supported".to_string(),
+        ).into());
+    }
+
+    // Check for supported formats
+    let supported_formats = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    let is_supported = supported_formats
+        .iter()
+        .any(|format| header.contains(format));
+
+    if !is_supported {
+        return Err(AppError::UnsupportedImageType(
+            "Unsupported image format. Please use JPEG, PNG, or WebP".to_string(),
+        ).into());
+    }
+
+    // Check approximate size (base64 is ~33% larger than binary)
+    let approximate_binary_size = (data.len() * 3) / 4;
+    if approximate_binary_size > MAX_IMAGE_SIZE {
+        return Err(AppError::ImageTooLarge(
+            format!("Image is too large (max {}MB)", MAX_IMAGE_SIZE / (1024 * 1024)),
+        ).into());
+    }
+
+    // Basic base64 validation
+    if !is_valid_base64(data) {
+        return Err(AppError::InvalidImageFormat(
+            "Invalid base64 image data".to_string(),
+        ).into());
+    }
+
+    Ok(())
+}
+
+fn is_valid_base64(s: &str) -> bool {
+    // Remove padding characters and check if remaining chars are valid base64
+    let s = s.trim_end_matches('=');
+    s.chars().all(|c| c.is_ascii_alphanumeric() || c == '+' || c == '/' || c == '=')
 }

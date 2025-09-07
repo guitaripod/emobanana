@@ -84,9 +84,16 @@ impl GeminiProvider {
                 .text()
                 .await
                 .unwrap_or_else(|_| "Unknown error".to_string());
-            return Err(
-                AppError::InternalError(format!("Gemini API error: {}", error_text)).into(),
-            );
+
+            let error = match response.status_code() {
+                400 => AppError::GeminiInvalidRequest(format!("Invalid request to Gemini API: {}", error_text)),
+                401 | 403 => AppError::GeminiApiError("Authentication failed with Gemini API".to_string()),
+                429 => AppError::GeminiQuotaExceeded("Gemini API quota exceeded".to_string()),
+                500..=599 => AppError::GeminiApiError(format!("Gemini API server error: {}", error_text)),
+                _ => AppError::GeminiApiError(format!("Gemini API error: {}", error_text)),
+            };
+
+            return Err(error.into());
         }
 
         let response_text = response
@@ -157,8 +164,20 @@ impl GeminiProvider {
 
         for candidate in response.candidates.iter() {
             if let Some(finish_reason) = &candidate.finish_reason {
-                if finish_reason == "PROHIBITED_CONTENT" {
-                    return Err(AppError::InternalError("PROHIBITED_CONTENT".to_string()).into());
+                match finish_reason.as_str() {
+                    "PROHIBITED_CONTENT" => {
+                        return Err(AppError::GeminiContentFiltered("Content was flagged as inappropriate by Gemini".to_string()).into());
+                    }
+                    "SAFETY" => {
+                        return Err(AppError::GeminiContentFiltered("Content violated safety guidelines".to_string()).into());
+                    }
+                    "RECITATION" => {
+                        return Err(AppError::TransformationFailed("Gemini could not process this type of content".to_string()).into());
+                    }
+                    "OTHER" => {
+                        return Err(AppError::TransformationFailed("Gemini encountered an unknown error".to_string()).into());
+                    }
+                    _ => {}
                 }
             }
 
@@ -173,7 +192,7 @@ impl GeminiProvider {
                 }
             }
         }
-        Err(AppError::InternalError(
+        Err(AppError::TransformationFailed(
             "Gemini did not return an image. Try a different photo or emoji.".to_string(),
         )
         .into())
